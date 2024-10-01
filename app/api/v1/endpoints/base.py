@@ -1,0 +1,6 @@
+from app.api.v1.endpoints.item import item_router
+from app.core.config import settings
+
+
+def api_controller(app):
+    app.include_router(item_router, prefix=f'{settings.API_PREFIX}', tags=['Item'])
