@@ -25,6 +25,14 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         self.model = model
 
+    def get_all(self, db: Session, skip: int = 0, limit: int = 100):
+        return (
+            db.query(self.model)
+            # .order_by(self.model.modified_at.desc())
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
 
     def get(self, db: Session, _id: int) -> Optional[ModelType]:
         return db.query(self.model).filter(self.model.id == _id).first()
@@ -33,6 +41,31 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         try:
             obj_in_data = jsonable_encoder(obj_in)
             db_obj = self.model(**obj_in_data)  # type: ignore
+            db.add(db_obj)
+            db.commit()
+            db.refresh(db_obj)
+        except exc.IntegrityError as err:
+            error = err.orig.args
+            raise HTTPException(status_code=500, detail=error[0])
+        return db_obj
+
+
+    @staticmethod
+    def update(
+            db: Session,
+            *,
+            db_obj: ModelType,
+            obj_in: Union[UpdateSchemaType, Dict[str, Any]]
+    ) -> ModelType:
+        try:
+            obj_data = jsonable_encoder(db_obj)
+            if isinstance(obj_in, dict):
+                update_data = obj_in
+            else:
+                update_data = obj_in.model_dump(exclude_unset=True)
+            for field in obj_data:
+                if field in update_data:
+                    setattr(db_obj, field, update_data[field])
             db.add(db_obj)
             db.commit()
             db.refresh(db_obj)
