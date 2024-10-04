@@ -1,3 +1,5 @@
+import logging
+from http import HTTPStatus
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 
 from fastapi import HTTPException
@@ -7,6 +9,9 @@ from sqlalchemy.orm import Session
 from sqlalchemy import exc
 
 from app.db.base_class import Base
+from exceptions.exceptions import DatabaseException, APIException
+
+logger = logging.getLogger(__name__)
 
 ModelType = TypeVar("ModelType", bound=Base)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -25,17 +30,28 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         self.model = model
 
-    def get_all(self, db: Session, skip: int = 0, limit: int = 100):
-        return (
-            db.query(self.model)
-            # .order_by(self.model.modified_at.desc())
-            .offset(skip)
-            .limit(limit)
-            .all()
-        )
+    def get_all(self, db: Session, skip: int = 0, limit: int = 100) -> List[ModelType]:
+        try:
+            return (
+                db.query(self.model)
+                .offset(skip)
+                .limit(limit)
+                .all()
+            )
+        except Exception as e:
+            # Log the exception (you may want to use your logger here)
+            logger.error(f"Error fetching all items: {str(e)}")
+            raise DatabaseException(
+                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                detail="An error occurred while fetching the items."
+            ) from e
 
     def get(self, db: Session, _id: int) -> Optional[ModelType]:
-        return db.query(self.model).filter(self.model.id == _id).first()
+        item = db.query(self.model).filter(self.model.id == _id).first()
+
+        if item is None:
+            raise APIException(status_code=HTTPStatus.NOT_FOUND, detail="Item not found.")
+        return item
 
     def create(self, db: Session, *, obj_in: CreateSchemaType) -> ModelType:
         try:
@@ -44,11 +60,24 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             db.add(db_obj)
             db.commit()
             db.refresh(db_obj)
-        except exc.IntegrityError as err:
-            error = err.orig.args
-            raise HTTPException(status_code=500, detail=error[0])
-        return db_obj
+        except exc.IntegrityError as e:
+            error = e.orig.args
+            # Check for unique constraints
+            if "UNIQUE" in str(e):
+                raise DatabaseException(status_code=HTTPStatus.CONFLICT, detail=error[0]) from e
+            # Check for foreign key constraints
+            elif "FOREIGN KEY" in str(e):
+                raise DatabaseException(status_code=HTTPStatus.BAD_REQUEST, detail=error[0]) from e
+            # Handle general integrity issues
+            else:
+                raise DatabaseException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=error[0]) from e
+        except Exception as e:
+            # Catch any unexpected errors and raise a 500 error
+            raise DatabaseException(
+                status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="An unexpected error occurred."
+            ) from e
 
+        return db_obj
 
     @staticmethod
     def update(
@@ -59,17 +88,31 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     ) -> ModelType:
         try:
             obj_data = jsonable_encoder(db_obj)
-            if isinstance(obj_in, dict):
-                update_data = obj_in
-            else:
-                update_data = obj_in.model_dump(exclude_unset=True)
+            update_data = obj_in.model_dump(exclude_unset=True) if not isinstance(obj_in, dict) else obj_in
+
             for field in obj_data:
                 if field in update_data:
                     setattr(db_obj, field, update_data[field])
+
             db.add(db_obj)
             db.commit()
             db.refresh(db_obj)
-        except exc.IntegrityError as err:
-            error = err.orig.args
-            raise HTTPException(status_code=500, detail=error[0])
+
+        except exc.IntegrityError as e:
+            error = e.orig.args
+            # Handle unique and foreign key constraints specifically
+            if "UNIQUE" in str(e):
+                raise DatabaseException(status_code=HTTPStatus.CONFLICT, detail=error[0]) from e
+            elif "FOREIGN KEY" in str(e):
+                raise DatabaseException(status_code=HTTPStatus.BAD_REQUEST, detail=error[0]) from e
+            else:
+                raise DatabaseException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=error[0]) from e
+
+        except Exception as e:
+            # Handle unexpected exceptions and raise a DatabaseException
+            raise DatabaseException(
+                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                detail="An unexpected error occurred during the update."
+            ) from e
+
         return db_obj
