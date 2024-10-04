@@ -1,8 +1,11 @@
+import logging
+
 from fastapi_pagination import paginate, Page
 from sqlalchemy.orm import Session
 
 from app import schemas, repositories
 
+logger = logging.getLogger(__name__)
 
 class ItemUseCase:
 
@@ -15,6 +18,8 @@ class ItemUseCase:
         Get all items record.
         """
         items = repositories.item.get_all(self.db, skip, limit)
+
+        logger.info("success")
 
         return paginate(items)
 
