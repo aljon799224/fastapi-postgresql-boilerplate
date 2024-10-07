@@ -46,7 +46,7 @@ jobs:
       run: docker compose up -d --build
 
     - name: Run alembic migrate
-      run: docker exec cookiecutter-fastapi-postgresql-web_1 bash -c "alembic upgrade head"
+      run: docker-compose exec web bash -c "alembic upgrade head"
 #
 #    - name: Create initial data
 #      run: docker exec cookiecutter-fastapi-postgresql-web_1 bash -c "python -m app.initial_data"
