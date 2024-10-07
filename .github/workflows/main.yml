@@ -41,7 +41,7 @@ jobs:
       run: poetry install
 
     - name: Run pre-commit on the app folder
-      run: poetry run pre-commit --show-diff-on-failure
+      run: poetry run pre-commit run --all-files --show-diff-on-failure
 
     - name: Start Docker Compose
       run: docker-compose up -d --build
