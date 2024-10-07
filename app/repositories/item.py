@@ -1,10 +1,14 @@
+"""Item Repository."""
+
 from app.models.item import Item
-from app.repositories.base import CRUDBase
+from app.repositories.base import BaseRepository
 from app.schemas.item import ItemIn
 
 
-class CRUDItem(CRUDBase[Item, ItemIn, ItemIn]):
+class ItemRepository(BaseRepository[Item, ItemIn, ItemIn]):
+    """CRUDItem Class."""
+
     pass
 
 
-item = CRUDItem(Item)
+item = ItemRepository(Item)
