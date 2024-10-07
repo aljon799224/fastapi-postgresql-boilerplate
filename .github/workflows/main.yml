@@ -1,0 +1,56 @@
+name: SOC1-Project
+
+# This workflow is triggered only on pushes to the develop branch
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      INSTALL_DEV: true
+        SQLALCHEMY_DATABASE_URL=postgresql://user:password@db:5432/db
+        POSTGRES_DB=db
+        POSTGRES_USER=user
+        POSTGRES_PASSWORD=password
+        POSTGRES_SERVER=db
+        PGADMIN_DEFAULT_EMAIL=admin@yahoo.com
+        PGADMIN_DEFAULT_PASSWORD=admin
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.12
+
+    - name: Install Poetry
+      run: curl -sSL https://install.python-poetry.org | python -
+
+    - name: Configure Poetry
+      run: |
+        poetry config virtualenvs.create false
+        poetry config virtualenvs.in-project false
+
+    - name: Install dependencies
+      run: poetry install
+
+    - name: Run pre-commit on the app folder
+      run: poetry run pre-commit --show-diff-on-failure
+
+    - name: Start Docker Compose
+      run: docker-compose up -d --build
+
+    - name: Run alembic migrate
+      run: docker exec soc1_web_1 bash -c "alembic upgrade head"
+#
+#    - name: Create initial data
+#      run: docker exec cookiecutter-fastapi-postgresql-web_1 bash -c "python -m app.initial_data"
+#
+#    - name: Exec into Container and Run pytest
+#      run: docker exec cookiecutter-fastapi-postgresql-web_1 bash -c "pytest"
