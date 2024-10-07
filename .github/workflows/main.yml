@@ -44,7 +44,7 @@ jobs:
       run: poetry run pre-commit run --all-files --show-diff-on-failure
 
     - name: Start Docker Compose
-      run: docker-compose up -d --build
+      run: docker compose up -d --build
 
     - name: Run alembic migrate
       run: docker exec soc1_web_1 bash -c "alembic upgrade head"
