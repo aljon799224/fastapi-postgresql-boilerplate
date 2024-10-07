@@ -10,16 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      INSTALL_DEV: true
-      SQLALCHEMY_DATABASE_URL: postgresql://user:password@db:5432/db
-      POSTGRES_DB: db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_SERVER: db
-      PGADMIN_DEFAULT_EMAIL: admin@yahoo.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -42,6 +32,15 @@ jobs:
 
     - name: Run pre-commit on the app folder
       run: poetry run pre-commit run --all-files --show-diff-on-failure
+
+    - name: Create .env file
+      run: |
+        echo "SQLALCHEMY_DATABASE_URL=postgresql://user:password@db:5432/db" >> .env
+        echo "POSTGRES_DB=db" >> .env
+        echo "POSTGRES_USER=user" >> .env
+        echo "POSTGRES_PASSWORD=password" >> .env
+        echo "PGADMIN_DEFAULT_EMAIL=admin@yahoo.com" >> .env
+        echo "PGADMIN_DEFAULT_PASSWORD=admin" >> .env
 
     - name: Start Docker Compose
       run: docker compose up -d --build
