@@ -7,9 +7,6 @@ venv/
 .env
 .venv/
 
-# Poetry specific
-poetry.lock
-
 # Docker files
 *.dockerfile
 docker-compose.override.yml
