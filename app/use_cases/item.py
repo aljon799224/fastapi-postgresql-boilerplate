@@ -20,14 +20,14 @@ class ItemUseCase:
         """Initialize with db."""
         self.db = db
 
-    def get_all(self, skip: int, limit: int) -> Page[schemas.ItemOut]:
+    def get_items(self) -> Union[Page[schemas.ItemOut], JSONResponse]:
         """Get all items record."""
         try:
-            items = repositories.item.get_all(self.db, skip, limit)
+            items = repositories.item.get_all(self.db)
 
         except DatabaseException as e:
             logger.error(f"Database error occurred while creating item: {e.detail}")
-            raise e
+            return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
 
         return paginate(items)
 

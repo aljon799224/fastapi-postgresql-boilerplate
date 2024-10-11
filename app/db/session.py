@@ -16,7 +16,7 @@ engine = create_engine(settings.SQLALCHEMY_DATABASE_URL, pool_pre_ping=True)
 
 # Create database if it does not exist
 if not database_exists(engine.url):
-    create_database(engine.url)
+    create_database(engine.url)  # pragma: no cover
 else:
     # Connect the database if exists
     engine.connect()
@@ -26,13 +26,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Dependency callable for DB
 def get_db() -> Generator:
-    """Yield a new database session.
-
-    Ensures the session is closed after use.
-
-    Yields:
-        Generator: A SQLAlchemy session object.
-    """
+    """Yield a new database session."""
     db = None
     try:
         db = SessionLocal()
