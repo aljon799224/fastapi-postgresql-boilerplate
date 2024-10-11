@@ -52,4 +52,4 @@ jobs:
 #      run: docker exec cookiecutter-fastapi-postgresql-web_1 bash -c "python -m app.initial_data"
 #
     - name: Exec into Container and Run pytest
-      run: docker exec cookiecutter-fastapi-postgresql-web_1  bash -c "pytest --cov=app --cov-report term-missing -vv"
+      run: docker exec $(docker-compose ps -q web) bash -c "pytest --cov=app --cov-report term-missing -vv"
