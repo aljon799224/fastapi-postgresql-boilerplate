@@ -32,10 +32,10 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         self.model = model
 
-    def get_all(self, db: Session, skip: int = 0, limit: int = 100) -> List[ModelType]:
+    def get_all(self, db: Session) -> List[ModelType]:
         """Retrieve all records, with optional pagination."""
         try:
-            return db.query(self.model).offset(skip).limit(limit).all()
+            return db.query(self.model).all()
         except Exception as e:
             # Log the exception (you may want to use your logger here)
             logger.error(f"Error fetching all items: {str(e)}")
@@ -64,22 +64,11 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             db.refresh(db_obj)
         except exc.IntegrityError as e:
             error = e.orig.args
-            # Check for unique constraints
-            if "UNIQUE" in str(e):
-                raise DatabaseException(
-                    status_code=HTTPStatus.CONFLICT, detail=error[0]
-                ) from e
-            # Check for foreign key constraints
-            elif "FOREIGN KEY" in str(e):
-                raise DatabaseException(
-                    status_code=HTTPStatus.BAD_REQUEST, detail=error[0]
-                ) from e
-            # Handle general integrity issues
-            else:
-                raise DatabaseException(
-                    status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-                    detail=error[0],
-                ) from e
+
+            raise DatabaseException(
+                status_code=HTTPStatus.CONFLICT, detail=error[0]
+            ) from e
+
         except Exception as e:
             # Catch any unexpected errors and raise a 500 error
             raise DatabaseException(
@@ -96,7 +85,7 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db_obj: ModelType,
         obj_in: Union[UpdateSchemaType, Dict[str, Any]],
     ) -> ModelType:
-        """Update record by its ID.."""
+        """Update record by its ID."""
         try:
             obj_data = jsonable_encoder(db_obj)
             update_data = (
@@ -115,20 +104,9 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
         except exc.IntegrityError as e:
             error = e.orig.args
-            # Handle unique and foreign key constraints specifically
-            if "UNIQUE" in str(e):
-                raise DatabaseException(
-                    status_code=HTTPStatus.CONFLICT, detail=error[0]
-                ) from e
-            elif "FOREIGN KEY" in str(e):
-                raise DatabaseException(
-                    status_code=HTTPStatus.BAD_REQUEST, detail=error[0]
-                ) from e
-            else:
-                raise DatabaseException(
-                    status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-                    detail=error[0],
-                ) from e
+            raise DatabaseException(
+                status_code=HTTPStatus.CONFLICT, detail=error[0]
+            ) from e
 
         except Exception as e:
             # Handle unexpected exceptions and raise a DatabaseException

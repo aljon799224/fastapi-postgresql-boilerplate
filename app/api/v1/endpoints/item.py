@@ -6,17 +6,17 @@ from sqlalchemy.orm import Session
 
 from app import schemas
 from app.db.session import get_db
-from app.usecases.item import ItemUseCase
+from app.use_cases.item import ItemUseCase
 
 item_router = APIRouter()
 
 
 @item_router.get("/item", response_model=Page[schemas.ItemOut])
-def get_all_items(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
+def get_items(db: Session = Depends(get_db)):
     """Get all items."""
     item_uc = ItemUseCase(db=db)
 
-    items = item_uc.get_all(skip, limit)
+    items = item_uc.get_items()
 
     return items
 

@@ -1,1 +1,1 @@
-"""This package contains test usecases for the application."""
+"""This package contains test use_cases for the application."""
