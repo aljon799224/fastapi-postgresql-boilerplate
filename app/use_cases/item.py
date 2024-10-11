@@ -26,7 +26,7 @@ class ItemUseCase:
             items = repositories.item.get_all(self.db)
 
         except DatabaseException as e:
-            logger.error(f"Database error occurred while creating item: {e.detail}")
+            logger.error(f"Database error occurred while fetching items: {e.detail}")
             return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
 
         return paginate(items)
@@ -39,7 +39,7 @@ class ItemUseCase:
             return schemas.ItemOut.model_validate(item)
 
         except APIException as e:
-            logger.error(f"Database error occurred while creating item: {e.detail}")
+            logger.error(f"Database error occurred while fetching item: {e.detail}")
             return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
 
     def create_item(
@@ -74,7 +74,7 @@ class ItemUseCase:
             return schemas.ItemOut.model_validate(item_update)
 
         except (DatabaseException, APIException) as e:
-            logger.error(f"Database error occurred while creating item: {e.detail}")
+            logger.error(f"Database error occurred while updating item: {e.detail}")
             return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
 
     def delete_item(self, _id: int) -> Union[schemas.ItemOut, JSONResponse]:
@@ -85,5 +85,5 @@ class ItemUseCase:
             return schemas.ItemOut.model_validate(item_update)
 
         except (DatabaseException, APIException) as e:
-            logger.error(f"Database error occurred while creating item: {e.detail}")
+            logger.error(f"Database error occurred while deleting item: {e.detail}")
             return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
