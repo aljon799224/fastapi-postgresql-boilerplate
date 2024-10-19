@@ -4,10 +4,10 @@ from http import HTTPStatus
 from unittest.mock import patch
 
 from app.core.config import settings
-from tests.api.v1.endpoints import test_client
+from tests.controllers.api.v1.endpoints import test_client
 
 
-@patch("app.api.v1.endpoints.item.ItemUseCase", spec=True)
+@patch("app.controllers.api.v1.endpoints.item.ItemUseCase", spec=True)
 def test_get_items(item_uc, items_out):
     """Test gel all items."""
     item_uc_instance = item_uc.return_value
@@ -19,7 +19,7 @@ def test_get_items(item_uc, items_out):
     assert response.status_code == HTTPStatus.OK
 
 
-@patch("app.api.v1.endpoints.item.ItemUseCase", spec=True)
+@patch("app.controllers.api.v1.endpoints.item.ItemUseCase", spec=True)
 def test_get_item(item_uc, item_db_out, item_out):
     """Test gel item."""
     item_uc_instance = item_uc.return_value
@@ -31,7 +31,7 @@ def test_get_item(item_uc, item_db_out, item_out):
     assert response.status_code == HTTPStatus.OK
 
 
-@patch("app.api.v1.endpoints.item.ItemUseCase", spec=True)
+@patch("app.controllers.api.v1.endpoints.item.ItemUseCase", spec=True)
 def test_create_item(item_uc, item_db_out, item_out):
     """Test create item."""
     item_uc_instance = item_uc.return_value
@@ -45,7 +45,7 @@ def test_create_item(item_uc, item_db_out, item_out):
     assert response.status_code == HTTPStatus.OK
 
 
-@patch("app.api.v1.endpoints.item.ItemUseCase", spec=True)
+@patch("app.controllers.api.v1.endpoints.item.ItemUseCase", spec=True)
 def test_update_item(item_uc, item_db_out, item_out):
     """Test update item."""
     item_uc_instance = item_uc.return_value
@@ -59,7 +59,7 @@ def test_update_item(item_uc, item_db_out, item_out):
     assert response.status_code == HTTPStatus.OK
 
 
-@patch("app.api.v1.endpoints.item.ItemUseCase", spec=True)
+@patch("app.controllers.api.v1.endpoints.item.ItemUseCase", spec=True)
 def test_delete_item(item_uc, item_db_out, item_out):
     """Test delete item."""
     item_uc_instance = item_uc.return_value
