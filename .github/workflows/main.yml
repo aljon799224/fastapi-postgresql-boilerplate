@@ -1,4 +1,4 @@
-name: SOC1-Project
+name: cookiecutter-fastapi-postgresql
 
 # This workflow is triggered only on pushes to the develop branch
 on:
