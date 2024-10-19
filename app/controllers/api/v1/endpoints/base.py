@@ -1,6 +1,6 @@
 """Base Endpoint."""
 
-from app.api.v1.endpoints.item import item_router
+from app.controllers.api.v1.endpoints.item import item_router
 from app.core.config import settings
 
 
