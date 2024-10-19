@@ -6,7 +6,7 @@ import pytest
 from sqlalchemy.exc import IntegrityError
 
 from app.models import Item
-from app.repositories import item
+from app.repositories.item import ItemRepository
 from exceptions.exceptions import DatabaseException, APIException
 
 
@@ -16,7 +16,8 @@ def test_get_items(mock_session):
     mock_session.query.return_value.all.return_value = mock_data
 
     # Call the method
-    result = item.get_all(mock_session)
+    item_repo = ItemRepository(Item)
+    result = item_repo.get_all(mock_session)
 
     # Assertions
     mock_session.query.assert_called_once()
@@ -30,7 +31,8 @@ def test_get_items_exception(mock_session):
 
     # Expect DatabaseException
     with pytest.raises(DatabaseException) as exc_info:
-        item.get_all(mock_session)
+        item_repo = ItemRepository(Item)
+        item_repo.get_all(mock_session)
 
     # Assertions
     assert exc_info.value.detail == "An error occurred while fetching the items."
@@ -42,7 +44,8 @@ def test_get_item(mock_session):
     mock_session.query.return_value.filter.return_value.first.return_value = mock_data
 
     # Call the method
-    result = item.get(mock_session, _id=1)
+    item_repo = ItemRepository(Item)
+    result = item_repo.get(mock_session, _id=1)
 
     # Assertions
     mock_session.query.assert_called_once()
@@ -55,7 +58,8 @@ def test_get_item_not_found(mock_session):
 
     # Expect API Exception
     with pytest.raises(APIException) as exc_info:
-        item.get(mock_session, _id=1)
+        item_repo = ItemRepository(Item)
+        item_repo.get(mock_session, _id=1)
 
     # Assertions
     mock_session.query.assert_called_once()
@@ -64,7 +68,8 @@ def test_get_item_not_found(mock_session):
 
 def test_create_item_success(mock_session, item_db_in):
     """Test successful creation of an item."""
-    create_item = item.create(db=mock_session, obj_in=item_db_in)
+    item_repo = ItemRepository(Item)
+    create_item = item_repo.create(db=mock_session, obj_in=item_db_in)
 
     mock_session.add.assert_called_once()
     mock_session.commit.assert_called_once()
@@ -86,7 +91,8 @@ def test_create_item_integrity_error(mock_session, item_db_in):
 
     # Check that DatabaseException is raised
     with pytest.raises(DatabaseException) as exc_info:
-        item.create(db=mock_session, obj_in=item_db_in)
+        item_repo = ItemRepository(Item)
+        item_repo.create(db=mock_session, obj_in=item_db_in)
 
     mock_session.add.assert_called_once()
     mock_session.commit.assert_called_once()
@@ -102,7 +108,8 @@ def test_create_item_exception_error(mock_session, item_db_in):
 
     # Check that DatabaseException is raised
     with pytest.raises(DatabaseException) as exc_info:
-        item.create(db=mock_session, obj_in=item_db_in)
+        item_repo = ItemRepository(Item)
+        item_repo.create(db=mock_session, obj_in=item_db_in)
 
     mock_session.add.assert_called_once()
     mock_session.commit.assert_not_called()
@@ -116,7 +123,8 @@ def test_update_item_success(mock_session, item_db_in):
     mock_data = Item()
     mock_data.name = "Item 2"
 
-    update_item = item.update(db=mock_session, obj_in=item_db_in, db_obj=mock_data)
+    item_repo = ItemRepository(Item)
+    update_item = item_repo.update(db=mock_session, obj_in=item_db_in, db_obj=mock_data)
 
     mock_session.add.assert_called_once()
     mock_session.commit.assert_called_once()
@@ -139,7 +147,8 @@ def test_update_item_integrity_error(mock_session, item_db_in):
     # Check that DatabaseException is raised
     with pytest.raises(DatabaseException) as exc_info:
         item_model = Item()
-        item.update(db=mock_session, obj_in=item_db_in, db_obj=item_model)
+        item_repo = ItemRepository(Item)
+        item_repo.update(db=mock_session, obj_in=item_db_in, db_obj=item_model)
 
     mock_session.add.assert_called_once()
     mock_session.commit.assert_called_once()
@@ -156,7 +165,8 @@ def test_update_item_exception_error(mock_session, item_db_in):
     # Check that DatabaseException is raised
     with pytest.raises(DatabaseException) as exc_info:
         item_model = Item()
-        item.update(db=mock_session, obj_in=item_db_in, db_obj=item_model)
+        item_repo = ItemRepository(Item)
+        item_repo.update(db=mock_session, obj_in=item_db_in, db_obj=item_model)
 
     mock_session.add.assert_called_once()
     mock_session.commit.assert_not_called()
@@ -170,7 +180,8 @@ def test_delete_item_success(mock_session):
     mock_data = Item()
     mock_session.query.return_value.get.return_value = mock_data
 
-    delete_item = item.delete(db=mock_session, _id=1)
+    item_repo = ItemRepository(Item)
+    delete_item = item_repo.delete(db=mock_session, _id=1)
 
     mock_session.query.assert_called_once()
     mock_session.commit.assert_called_once()
@@ -184,7 +195,8 @@ def test_delete_item_not_found(mock_session):
     mock_session.query.return_value.get.return_value = None
 
     with pytest.raises(APIException) as exc_info:
-        item.delete(db=mock_session, _id=1)
+        item_repo = ItemRepository(Item)
+        item_repo.delete(db=mock_session, _id=1)
 
     mock_session.query.assert_called_once()
     mock_session.commit.assert_not_called()
@@ -199,7 +211,8 @@ def test_delete_item_exception(mock_session):
     mock_session.query.side_effect = Exception("error")
 
     with pytest.raises(DatabaseException) as exc_info:
-        item.delete(db=mock_session, _id=1)
+        item_repo = ItemRepository(Item)
+        item_repo.delete(db=mock_session, _id=1)
 
     mock_session.query.assert_called_once()
     mock_session.commit.assert_not_called()

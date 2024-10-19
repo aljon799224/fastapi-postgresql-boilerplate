@@ -9,6 +9,3 @@ class ItemRepository(BaseRepository[Item, ItemIn, ItemIn]):
     """CRUDItem Class."""
 
     pass
-
-
-item = ItemRepository(Item)

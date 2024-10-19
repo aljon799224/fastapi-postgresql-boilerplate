@@ -11,12 +11,13 @@ from app.use_cases.item import ItemUseCase
 from exceptions.exceptions import DatabaseException, APIException
 
 
-@patch("app.repositories.item", spec=True)
+@patch("app.use_cases.item.ItemRepository", spec=True)
 @patch("app.use_cases.item.paginate", spec=True)
 def test_get_items(m_paginate, m_repo_item, mock_session):
     """Test get items."""
     mock_data = [Item(), Item()]
-    m_repo_item.get_all.return_value = mock_data
+    m_repo_item_instance = m_repo_item.return_value
+    m_repo_item_instance.get_all.return_value = mock_data
     m_paginate.return_value = Page(
         items=mock_data, total=len(mock_data), page=1, size=10
     )
@@ -32,10 +33,11 @@ def test_get_items(m_paginate, m_repo_item, mock_session):
     assert response.size == 10
 
 
-@patch("app.repositories.item", spec=True)
+@patch("app.use_cases.item.ItemRepository", spec=True)
 def test_get_items_exception(m_repo_item, mock_session):
     """Test get items with exception."""
-    m_repo_item.get_all.side_effect = DatabaseException(
+    m_repo_item_instance = m_repo_item.return_value
+    m_repo_item_instance.get_all.side_effect = DatabaseException(
         status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="error"
     )
 
@@ -47,13 +49,14 @@ def test_get_items_exception(m_repo_item, mock_session):
     assert isinstance(response, JSONResponse)
 
 
-@patch("app.repositories.item", spec=True)
+@patch("app.use_cases.item.ItemRepository", spec=True)
 def test_get_item(m_repo_item, mock_session, item_db_out):
     """Test get item."""
     mock_data = Item()
     mock_data.id = 1
     mock_data.name = "Item 1"
-    m_repo_item.get.return_value = mock_data
+    m_repo_item_instance = m_repo_item.return_value
+    m_repo_item_instance.get.return_value = mock_data
 
     item_uc = ItemUseCase(db=mock_session)
 
@@ -62,10 +65,11 @@ def test_get_item(m_repo_item, mock_session, item_db_out):
     assert response == item_db_out
 
 
-@patch("app.repositories.item", spec=True)
+@patch("app.use_cases.item.ItemRepository", spec=True)
 def test_get_item_exception(m_repo_item, mock_session, item_db_out):
     """Test get item exception."""
-    m_repo_item.get.side_effect = APIException(
+    m_repo_item_instance = m_repo_item.return_value
+    m_repo_item_instance.get.side_effect = APIException(
         status_code=HTTPStatus.CONFLICT, detail="error"
     )
 
@@ -77,14 +81,15 @@ def test_get_item_exception(m_repo_item, mock_session, item_db_out):
     assert isinstance(response, JSONResponse)
 
 
-@patch("app.repositories.item", spec=True)
+@patch("app.use_cases.item.ItemRepository", spec=True)
 def test_create_item(m_repo_item, mock_session, item_db_in, item_db_out):
     """Test create item."""
     mock_data = Item()
     mock_data.id = 1
     mock_data.name = "Item 1"
 
-    m_repo_item.create.return_value = mock_data
+    m_repo_item_instance = m_repo_item.return_value
+    m_repo_item_instance.create.return_value = mock_data
 
     item_uc = ItemUseCase(db=mock_session)
 
@@ -93,10 +98,11 @@ def test_create_item(m_repo_item, mock_session, item_db_in, item_db_out):
     assert response == item_db_out
 
 
-@patch("app.repositories.item", spec=True)
+@patch("app.use_cases.item.ItemRepository", spec=True)
 def test_create_item_exception(m_repo_item, mock_session, item_db_in, item_db_out):
     """Test create item with exception."""
-    m_repo_item.create.side_effect = DatabaseException(
+    m_repo_item_instance = m_repo_item.return_value
+    m_repo_item_instance.create.side_effect = DatabaseException(
         status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="error"
     )
 
@@ -108,14 +114,15 @@ def test_create_item_exception(m_repo_item, mock_session, item_db_in, item_db_ou
     assert isinstance(response, JSONResponse)
 
 
-@patch("app.repositories.item", spec=True)
+@patch("app.use_cases.item.ItemRepository", spec=True)
 def test_update_item(m_repo_item, mock_session, item_db_in, item_db_out):
     """Test update item."""
     mock_data = Item()
     mock_data.id = 1
     mock_data.name = "Item 1"
 
-    m_repo_item.update.return_value = mock_data
+    m_repo_item_instance = m_repo_item.return_value
+    m_repo_item_instance.update.return_value = mock_data
 
     item_uc = ItemUseCase(db=mock_session)
 
@@ -124,10 +131,11 @@ def test_update_item(m_repo_item, mock_session, item_db_in, item_db_out):
     assert response == item_db_out
 
 
-@patch("app.repositories.item", spec=True)
+@patch("app.use_cases.item.ItemRepository", spec=True)
 def test_update_item_exception(m_repo_item, mock_session, item_db_in, item_db_out):
     """Test item with exception."""
-    m_repo_item.update.side_effect = DatabaseException(
+    m_repo_item_instance = m_repo_item.return_value
+    m_repo_item_instance.update.side_effect = DatabaseException(
         status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="error"
     )
 
@@ -139,14 +147,15 @@ def test_update_item_exception(m_repo_item, mock_session, item_db_in, item_db_ou
     assert isinstance(response, JSONResponse)
 
 
-@patch("app.repositories.item", spec=True)
+@patch("app.use_cases.item.ItemRepository", spec=True)
 def test_delete_item(m_repo_item, mock_session, item_db_out):
     """Test delete item."""
     mock_data = Item()
     mock_data.id = 1
     mock_data.name = "Item 1"
 
-    m_repo_item.delete.return_value = mock_data
+    m_repo_item_instance = m_repo_item.return_value
+    m_repo_item_instance.delete.return_value = mock_data
 
     item_uc = ItemUseCase(db=mock_session)
 
@@ -155,10 +164,11 @@ def test_delete_item(m_repo_item, mock_session, item_db_out):
     assert response == item_db_out
 
 
-@patch("app.repositories.item", spec=True)
+@patch("app.use_cases.item.ItemRepository", spec=True)
 def test_delete_item_exception(m_repo_item, mock_session, item_db_out):
     """Test delete item with exception."""
-    m_repo_item.delete.side_effect = DatabaseException(
+    m_repo_item_instance = m_repo_item.return_value
+    m_repo_item_instance.delete.side_effect = DatabaseException(
         status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="error"
     )
 
