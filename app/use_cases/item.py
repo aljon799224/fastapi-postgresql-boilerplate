@@ -19,7 +19,7 @@ class ItemUseCase:
     """Item Use Case Class."""
 
     def __init__(self, db: Session):
-        """Initialize with db."""
+        """Initialize with db and Item Repository."""
         self.db = db
         self.item_repository = ItemRepository(Item)
 
