@@ -6,6 +6,6 @@ from app.schemas.item import ItemIn
 
 
 class ItemRepository(BaseRepository[Item, ItemIn, ItemIn]):
-    """CRUDItem Class."""
+    """Item Repository Class."""
 
     pass

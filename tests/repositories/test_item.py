@@ -63,7 +63,7 @@ def test_get_item_not_found(mock_session):
 
     # Assertions
     mock_session.query.assert_called_once()
-    assert exc_info.value.detail == "Item not found."
+    assert exc_info.value.detail == "Record not found."
 
 
 def test_create_item_success(mock_session, item_db_in):

@@ -5,7 +5,7 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict
 
 
-class Item(BaseModel):
+class ItemBase(BaseModel):
     """Item Class."""
 
     model_config = ConfigDict(from_attributes=True)
@@ -13,13 +13,13 @@ class Item(BaseModel):
     name: Optional[str] = None
 
 
-class ItemIn(Item):
+class ItemIn(ItemBase):
     """ItemIn Class."""
 
     pass
 
 
-class ItemOut(Item):
+class ItemOut(ItemBase):
     """ItemOut Class."""
 
     id: int

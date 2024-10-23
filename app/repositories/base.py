@@ -50,7 +50,7 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
         if item is None:
             raise APIException(
-                status_code=HTTPStatus.NOT_FOUND, detail="Item not found."
+                status_code=HTTPStatus.NOT_FOUND, detail="Record not found."
             )
         return item
 
@@ -70,7 +70,6 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             ) from e
 
         except Exception as e:
-            # Catch any unexpected errors and raise a 500 error
             raise DatabaseException(
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
                 detail="An unexpected error occurred.",
