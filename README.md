@@ -1,9 +1,14 @@
-# **Cookiecutter Fastapi using Postgresql**
+# **Cookiecutter FastAPI with PostgreSQL, Docker, and Poetry**
 
 ## **Overview**
-This project is a FastAPI application that uses PostgreSQL for its database, 
-Docker for containerization, and Poetry for dependency management. 
-Below are the steps to set up, run, and maintain the project.
+This project is a fully containerized FastAPI application built using PostgreSQL for its database, 
+Docker for containerization, and Poetry for Python dependency management. It is designed to accelerate development 
+by leveraging Cookiecutter to scaffold a consistent and well-structured application.
+
+The project includes a pre-configured Docker Compose setup for managing services, a .env file for 
+handling environment variables, and GitHub Actions for continuous integration (CI). The GitHub Actions workflow 
+runs tests, checks code coverage, and ensures code quality automatically on every commit or pull request, 
+providing a seamless CI/CD pipeline for your FastAPI application.
 
 **Prerequisites**
 
@@ -22,7 +27,7 @@ creating a .env file in the root directory:
 
 **Example**
 
-```commandline
+```doctest
 SQLALCHEMY_DATABASE_URL=postgresql://user:password@db:5432/db
 POSTGRES_DB=db
 POSTGRES_USER=user
@@ -31,7 +36,6 @@ POSTGRES_SERVER=db
 PGADMIN_DEFAULT_EMAIL=admin@yahoo.com
 PGADMIN_DEFAULT_PASSWORD=admin
 ```
-
 
 ## **Run the Application**
 1. Build and start Docker containers:
