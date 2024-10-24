@@ -1,4 +1,4 @@
-# **Cookiecutter FastAPI with PostgreSQL, Docker, and Poetry**
+# **FastAPI with PostgreSQL, Docker, and Poetry**
 
 ## **Overview**
 This project is a fully containerized FastAPI application built using PostgreSQL for its database, 
@@ -16,7 +16,8 @@ Make sure you have the following installed:
 - **Docker**: Install Docker
 - **Docker Compose**: Install Docker Compose
 - **Poetry**: Install Poetry
-
+   ```commandline
+   pip install poetry
 
 ## **How to Run the Project**
 

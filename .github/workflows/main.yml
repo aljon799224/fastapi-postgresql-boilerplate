@@ -1,4 +1,4 @@
-name: cookiecutter-fastapi-postgresql
+name: fastapi-postgresql
 
 # This workflow is triggered only on pushes to the develop branch
 on:
@@ -49,7 +49,7 @@ jobs:
       run: docker compose exec web bash -c "poetry run alembic upgrade head"
 #
 #    - name: Create initial data
-#      run: docker exec cookiecutter-fastapi-postgresql-web_1 bash -c "python -m app.initial_data"
+#      run: docker exec fastapi-postgresql-boilerplate-web_1 bash -c "python -m app.initial_data"
 #
     - name: Exec into Container and Run pytest
       run: docker compose exec web bash -c "poetry run pytest --cov=app --cov-report term-missing -vv"
